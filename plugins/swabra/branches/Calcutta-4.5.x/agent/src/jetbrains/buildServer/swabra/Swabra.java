@@ -33,7 +33,6 @@ import java.util.*;
 
 
 public final class Swabra extends AgentLifeCycleAdapter {
-  public static final String CACHE_KEY = "swabra";
   public static final String WORK_DIR_PROP = "agent.work.dir";
 
   private SwabraLogger myLogger;
@@ -74,7 +73,11 @@ public final class Swabra extends AgentLifeCycleAdapter {
     final File tempDir = runningBuild.getAgentConfiguration().getCacheDirectory();
 
     myPropertiesProcessor = new SwabraPropertiesProcessor(tempDir, myLogger);
-    myPropertiesProcessor.readProperties();
+    try {
+      myPropertiesProcessor.readProperties();
+    } catch (Exception e) {
+      // normal case after agent restart - need clean checkout
+    }
 
     if (!isEnabled(myMode)) {
       myLogger.debug("Swabra is disabled");
@@ -114,7 +117,7 @@ public final class Swabra extends AgentLifeCycleAdapter {
       myPropertiesProcessor.writeProperties();
       myMode = null;
       if (myStrict) {
-        fail(myCheckoutDir);
+        fail();
       }
     }
   }
@@ -204,7 +207,7 @@ public final class Swabra extends AgentLifeCycleAdapter {
     });
   }
 
-  private void fail(@NotNull File checkoutDir) {
-    myLogger.message("##teamcity[buildStatus status='FAILURE' text='Swabra failed collecting']", true);
+  private void fail() {
+    myLogger.message("##teamcity[buildStatus status='FAILURE' text='Swabra failed cleanup']", true);
   }
 }
