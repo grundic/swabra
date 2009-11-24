@@ -75,6 +75,7 @@ public final class Snapshot {
     logger.message("Swabra: Saving state of checkout directory " + myCheckoutDir + " to snapshot file " + snapshot.getAbsolutePath(), true);
     BufferedWriter snapshotWriter = null;
     try {
+      snapshot.getParentFile().mkdirs();
       snapshotWriter = new BufferedWriter(new FileWriter(snapshot));
       snapshotWriter.write(myCheckoutDirParent + File.separator + "\r\n");
       snapshotWriter.write(myCheckoutDir.getName() + File.separator + SEPARATOR
