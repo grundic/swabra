@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="ruspd-pc02" name="jetbrains.buildServer.swabra.SwabraTest" tests="8" time="257.56" timestamp="2010-01-11T11:49:54">
+  <properties>
+    <property name="java.vendor" value="Sun Microsystems Inc." />
+    <property name="compiler.args.server" value="" />
+    <property name="compiler.debug" value="on" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="sun.management.compiler" value="HotSpot Client Compiler" />
+    <property name="env.COMMANDER_DRIVE" value="C:" />
+    <property name="tests.output.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/production/tests" />
+    <property name="env.PROMPT" value="$P$G" />
+    <property name="env.COMMANDER_PATH" value="C:\vbedrosova\Total Commander" />
+    <property name="os.name" value="Windows XP" />
+    <property name="env.FP_NO_HOST_CHECK" value="NO" />
+    <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.5.0_14\jre\lib\rt.jar;C:\Program Files\Java\jdk1.5.0_14\jre\lib\i18n.jar;C:\Program Files\Java\jdk1.5.0_14\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.5.0_14\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.5.0_14\jre\lib\jce.jar;C:\Program Files\Java\jdk1.5.0_14\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.5.0_14\jre\classes" />
+    <property name="env.COMPUTERNAME" value="RUSPD-PC02" />
+    <property name="compiler.args" value="" />
+    <property name="env.ALLUSERSPROFILE" value="C:\Documents and Settings\All Users" />
+    <property name="sun.desktop" value="windows" />
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc." />
+    <property name="ant.home" value="C:\vbedrosova\JetBrains\ideaIU-93.13-jdk15\lib\ant" />
+    <property name="java.runtime.version" value="1.5.0_14-b03" />
+    <property name="env.HOMEPATH" value="\Documents and Settings\vbedrosova" />
+    <property name="ant.file.swabra-custom" value="C:\vbedrosova\work\teamcityworkspace\swabra\build.xml" />
+    <property name="compiler.args.common" value="" />
+    <property name="user.name" value="vbedrosova" />
+    <property name="module.server.basedir" value="C:\vbedrosova\work\teamcityworkspace\swabra" />
+    <property name="path.variable.template" value="." />
+    <property name="common.testoutput.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/test/common" />
+    <property name="module.agent.basedir" value="C:\vbedrosova\work\teamcityworkspace\swabra" />
+    <property name="teamcity.internal.default.out" value="dist" />
+    <property name="user.language" value="ru" />
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.5.0_14\jre\bin" />
+    <property name="server.output.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/production/server" />
+    <property name="common.output.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/production/common" />
+    <property name="ant.project.name" value="swabra-custom" />
+    <property name="java.version" value="1.5.0_14" />
+    <property name="env.PROCESSOR_IDENTIFIER" value="x86 Family 6 Model 15 Stepping 11, GenuineIntel" />
+    <property name="user.timezone" value="" />
+    <property name="env.TEMP" value="C:\DOCUME~1\VBEDRO~1\LOCALS~1\Temp" />
+    <property name="sun.arch.data.model" value="32" />
+    <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.5.0_14\jre\lib\endorsed" />
+    <property name="env.FLEX_HOME" value="C:\Flex\flex_sdk_3.3.0.4852" />
+    <property name="sun.cpu.isalist" value="pentium_pro+mmx pentium_pro pentium+mmx pentium i486 i386 i86" />
+    <property name="env.HOMEDRIVE" value="C:" />
+    <property name="sun.jnu.encoding" value="Cp1251" />
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="file.separator" value="\" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.class.version" value="49.0" />
+    <property name="path.variable.teamcitydistribution" value="C:/TeamCity" />
+    <property name="user.country" value="RU" />
+    <property name="java.home" value="C:\Program Files\Java\jdk1.5.0_14\jre" />
+    <property name="env.APPDATA" value="C:\Documents and Settings\vbedrosova\Application Data" />
+    <property name="ant.file.swabra" value="C:\vbedrosova\work\teamcityworkspace\swabra\swabra.xml" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="env.ComSpec" value="C:\WINDOWS\system32\cmd.exe" />
+    <property name="env.OS" value="Windows_NT" />
+    <property name="env.CommonProgramFiles" value="C:\Program Files\Common Files" />
+    <property name="ant.file" value="C:\vbedrosova\work\teamcityworkspace\swabra\build.xml" />
+    <property name="os.version" value="5.1" />
+    <property name="swabra.output.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/production/swabra" />
+    <property name="path.separator" value=";" />
+    <property name="java.vm.version" value="1.5.0_14-b03" />
+    <property name="agent.output.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/production/agent" />
+    <property name="user.variant" value="" />
+    <property name="env.USERPROFILE" value="C:\Documents and Settings\vbedrosova" />
+    <property name="ant.library.dir" value="C:\vbedrosova\JetBrains\ideaIU-93.13-jdk15\lib\ant\lib" />
+    <property name="env.JAVA_HOME" value="c:\Program Files\Java\jdk1.5.0_14" />
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob" />
+    <property name="env.TMP" value="C:\DOCUME~1\VBEDRO~1\LOCALS~1\Temp" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="swabra.testoutput.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/test/swabra" />
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit" />
+    <property name="ant.file.TeamCityPluginCommon" value="C:\vbedrosova\work\teamcityworkspace\swabra\teamcity-common.xml" />
+    <property name="env.EMAIL" value="C:\vbedrosova\private\bat" />
+    <property name="compiler.max.memory" value="128m" />
+    <property name="user.home" value="C:\Documents and Settings\vbedrosova" />
+    <property name="env.SESSIONNAME" value="Console" />
+    <property name="server.testoutput.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/test/server" />
+    <property name="java.specification.vendor" value="Sun Microsystems Inc." />
+    <property name="plugin.name" value="swabra" />
+    <property name="tests.testoutput.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/test/tests" />
+    <property name="env.VS80COMNTOOLS" value="C:\Program Files\Microsoft Visual Studio 8\Common7\Tools\" />
+    <property name="module.swabra.basedir" value="C:\vbedrosova\work\teamcityworkspace\swabra" />
+    <property name="java.library.path" value="C:\Program Files\Java\jdk1.5.0_14\jre\bin;.;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;c:\Program Files\Java\jdk1.5.0_14\bin;C:\Java\apache-ant-1.7.1\bin;C:\Flex\flex_sdk_3.3.0.4852\bin;C:\Program Files\CollabNet Subversion;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Perforce;c:\vbedrosova\work\Vault\vaultJavaCLC_5_0_1_18729\lib\;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\DTS\Binn\;C:\WINDOWS\system32\WindowsPowerShell\v1.0;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE\;c:\java\jdk1.6.0_07\jre\bin" />
+    <property name="java.vendor.url" value="http://java.sun.com/" />
+    <property name="env.NUMBER_OF_PROCESSORS" value="2" />
+    <property name="env.USERDNSDOMAIN" value="SWIFTTEAMS.LOCAL" />
+    <property name="java.vm.vendor" value="Sun Microsystems Inc." />
+    <property name="compiler.args.tests" value="" />
+    <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition" />
+    <property name="java.class.path" value="C:\vbedrosova\work\teamcityworkspace\swabra\out\production\tests;C:\vbedrosova\work\teamcityworkspace\swabra\out\test\tests;C:\vbedrosova\work\teamcityworkspace\swabra\tests\lib\junit-4.5.jar;C:\TeamCity\devPackage\agent-api.jar;C:\TeamCity\devPackage\runtime-util.jar;C:\TeamCity\webapps\ROOT\WEB-INF\lib\annotations.jar;C:\TeamCity\webapps\ROOT\WEB-INF\lib\openapi.jar;C:\TeamCity\webapps\ROOT\WEB-INF\lib\processesTerminator.jar;C:\TeamCity\webapps\ROOT\WEB-INF\lib\trove4j.jar;C:\TeamCity\webapps\ROOT\WEB-INF\lib\util.jar;C:\TeamCity\devPackage\common-api.jar;C:\vbedrosova\work\teamcityworkspace\swabra\out\production\agent;C:\vbedrosova\work\teamcityworkspace\swabra\out\test\agent;C:\vbedrosova\work\teamcityworkspace\swabra\out\production\common;C:\vbedrosova\work\teamcityworkspace\swabra\out\test\common;C:\TeamCity\webapps\ROOT\WEB-INF\lib\log4j-1.2.12.jar;C:\vbedrosova\work\teamcityworkspace\swabra\tests\lib\hamcrest-library-1.1.jar;C:\vbedrosova\work\teamcityworkspace\swabra\tests\lib\jmock-2.5.1.jar;C:\vbedrosova\work\teamcityworkspace\swabra\tests\lib\jmock-junit4-2.5.1.jar;C:\vbedrosova\JetBrains\ideaIU-93.13-jdk15\lib\ant\lib\ant-launcher.jar;C:\vbedrosova\JetBrains\ideaIU-93.13-jdk15\lib\ant\lib\ant.jar;C:\vbedrosova\JetBrains\ideaIU-93.13-jdk15\lib\ant\lib\ant-junit.jar" />
+    <property name="ant.version" value="Apache Ant version 1.7.1 compiled on June 27 2008" />
+    <property name="path.variable.vaultapi" value="." />
+    <property name="compiler.args.agent" value="" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="env.LOGONSERVER" value="\\ST-SERVER" />
+    <property name="env.windir" value="C:\WINDOWS" />
+    <property name="java.vm.specification.version" value="1.0" />
+    <property name="env.PROCESSOR_ARCHITECTURE" value="x86" />
+    <property name="sun.os.patch.level" value="Service Pack 3" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="env.ProgramFiles" value="C:\Program Files" />
+    <property name="env.ANT_HOME" value="C:\Java\apache-ant-1.7.1" />
+    <property name="java.io.tmpdir" value="C:\DOCUME~1\VBEDRO~1\LOCALS~1\Temp\" />
+    <property name="env.PROCESSOR_REVISION" value="0f0b" />
+    <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi" />
+    <property name="env.SystemRoot" value="C:\WINDOWS" />
+    <property name="compiler.args.swabra" value="" />
+    <property name="os.arch" value="x86" />
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment" />
+    <property name="compiler.generate.no.warnings" value="off" />
+    <property name="module.tests.basedir" value="C:\vbedrosova\work\teamcityworkspace\swabra" />
+    <property name="java.ext.dirs" value="C:\Program Files\Java\jdk1.5.0_14\jre\lib\ext" />
+    <property name="module.common.basedir" value="C:\vbedrosova\work\teamcityworkspace\swabra" />
+    <property name="user.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra" />
+    <property name="line.separator" value="
+" />
+    <property name="java.vm.name" value="Java HotSpot(TM) Client VM" />
+    <property name="env.PATHEXT" value=".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.PSC1" />
+    <property name="env.Path" value="C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;c:\Program Files\Java\jdk1.5.0_14\bin;C:\Java\apache-ant-1.7.1\bin;C:\Flex\flex_sdk_3.3.0.4852\bin;C:\Program Files\CollabNet Subversion;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Perforce;c:\vbedrosova\work\Vault\vaultJavaCLC_5_0_1_18729\lib\;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\DTS\Binn\;C:\WINDOWS\system32\WindowsPowerShell\v1.0;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE\;c:\java\jdk1.6.0_07\jre\bin" />
+    <property name="basedir" value="C:\vbedrosova\work\teamcityworkspace\swabra" />
+    <property name="ant.java.version" value="1.5" />
+    <property name="ant.core.lib" value="C:\vbedrosova\JetBrains\ideaIU-93.13-jdk15\lib\ant\lib\ant.jar" />
+    <property name="env.USERNAME" value="vbedrosova" />
+    <property name="env.SystemDrive" value="C:" />
+    <property name="file.encoding" value="Cp1251" />
+    <property name="env.USERDOMAIN" value="SWIFTTEAMS" />
+    <property name="agent.testoutput.dir" value="C:\vbedrosova\work\teamcityworkspace\swabra/out/test/agent" />
+    <property name="env.COMMANDER_INI" value="C:\vbedrosova\Total Commander\wincmd.ini" />
+    <property name="java.specification.version" value="1.5" />
+    <property name="env.PROCESSOR_LEVEL" value="6" />
+  </properties>
+  <testcase classname="jetbrains.buildServer.swabra.SwabraTest" name="testEmptyCheckoutDirBeforeBuild" time="35.437" />
+  <testcase classname="jetbrains.buildServer.swabra.SwabraTest" name="testEmptyCheckoutDirAfterBuild" time="35.749" />
+  <testcase classname="jetbrains.buildServer.swabra.SwabraTest" name="testOneCreatedOneModifiedOneNotChangedBeforeBuild" time="31.062" />
+  <testcase classname="jetbrains.buildServer.swabra.SwabraTest" name="testOneCreatedOneModifiedOneNotChangedAfterBuild" time="31.234" />
+  <testcase classname="jetbrains.buildServer.swabra.SwabraTest" name="testOneCreatedOneModifiedOneNotChangedBeforeAfter" time="31.375" />
+  <testcase classname="jetbrains.buildServer.swabra.SwabraTest" name="testOneCreatedOneModifiedOneNotChangedAfterBefore" time="30.687" />
+  <testcase classname="jetbrains.buildServer.swabra.SwabraTest" name="testOneCreatedOneModifiedOneNotChangedTurnedOffBefore" time="31.015" />
+  <testcase classname="jetbrains.buildServer.swabra.SwabraTest" name="testOneCreatedOneModifiedOneNotChangedTurnedOffAfter" time="30.813" />
+  <system-out><![CDATA[CheckoutDir is C:\Documents and Settings\vbedrosova\Local Settings\Temp\test1244801221\checkout_dir
+CheckoutDir is C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-1019069785\checkout_dir
+CheckoutDir is C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-15542146\checkout_dir
+CheckoutDir is C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-88669460\checkout_dir
+CheckoutDir is C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-1387831503\checkout_dir
+CheckoutDir is C:\Documents and Settings\vbedrosova\Local Settings\Temp\test1295697829\checkout_dir
+CheckoutDir is C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-1865769582\checkout_dir
+CheckoutDir is C:\Documents and Settings\vbedrosova\Local Settings\Temp\test244969808\checkout_dir
+]]></system-out>
+  <system-err><![CDATA[[2010-01-11 14:49:56,093]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:49:56,108]   WARN - ains.buildServer.swabra.Swabra - Swabra: Need a valid checkout directory snapshot - forcing clean checkout for C:\Documents and Settings\vbedrosova\Local Settings\Temp\test1244801221\checkout_dir 
+[2010-01-11 14:50:13,264]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:50:30,561]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:50:30,561]   WARN - ains.buildServer.swabra.Swabra - Swabra: Need a valid checkout directory snapshot - forcing clean checkout for C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-1019069785\checkout_dir 
+[2010-01-11 14:50:48,639]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:51:06,029]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:51:06,029]   WARN - ains.buildServer.swabra.Swabra - Swabra: Need a valid checkout directory snapshot - forcing clean checkout for C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-15542146\checkout_dir 
+[2010-01-11 14:51:21,388]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:51:37,169]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:51:37,169]   WARN - ains.buildServer.swabra.Swabra - Swabra: Need a valid checkout directory snapshot - forcing clean checkout for C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-88669460\checkout_dir 
+[2010-01-11 14:51:52,841]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:52:08,450]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:52:08,450]   WARN - ains.buildServer.swabra.Swabra - Swabra: Need a valid checkout directory snapshot - forcing clean checkout for C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-1387831503\checkout_dir 
+[2010-01-11 14:52:24,169]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:52:39,669]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:52:39,669]   WARN - ains.buildServer.swabra.Swabra - Swabra: Need a valid checkout directory snapshot - forcing clean checkout for C:\Documents and Settings\vbedrosova\Local Settings\Temp\test1295697829\checkout_dir 
+[2010-01-11 14:52:55,028]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:53:10,465]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:53:25,902]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:53:25,902]   WARN - ains.buildServer.swabra.Swabra - Swabra: Need a valid checkout directory snapshot - forcing clean checkout for C:\Documents and Settings\vbedrosova\Local Settings\Temp\test-1865769582\checkout_dir 
+[2010-01-11 14:53:41,449]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:53:56,761]   WARN - ains.buildServer.swabra.Swabra - Swabra: no Handle executable prepared (swabra.handle.disable.download system property="True") 
+[2010-01-11 14:53:56,761]   WARN - ains.buildServer.swabra.Swabra - Swabra: Need a valid checkout directory snapshot - forcing clean checkout for C:\Documents and Settings\vbedrosova\Local Settings\Temp\test244969808\checkout_dir 
+]]></system-err>
+</testsuite>
