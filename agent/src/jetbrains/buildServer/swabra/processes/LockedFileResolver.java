@@ -75,9 +75,7 @@ public class LockedFileResolver {
 
     if (kill) {
       info("Try killing locking process(es) for " + f);
-      for (final long pid : pids) {
-        ProcessTreeTerminator.kill(pid, ProcessFilter.MATCH_ALL);
-      }
+      ProcessTreeTerminator.kill(ProcessFilter.MATCH_ALL);
 
       final List<Long> alivePids = myPidsProvider.getPids(f);
 
