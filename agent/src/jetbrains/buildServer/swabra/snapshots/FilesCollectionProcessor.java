@@ -1,5 +1,6 @@
 package jetbrains.buildServer.swabra.snapshots;
 
+import jetbrains.buildServer.swabra.Swabra;
 import jetbrains.buildServer.swabra.SwabraLogger;
 import jetbrains.buildServer.swabra.processes.LockedFileResolver;
 import jetbrains.buildServer.swabra.snapshots.iteration.FileInfo;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public class FilesCollectionProcessor implements FilesTraversal.ComparisonProcessor {
   @NotNull
-  private final SwabraLogger myLogger;
+  protected final SwabraLogger myLogger;
   private final LockedFileResolver myLockedFileResolver;
 
   private final boolean myStrictDeletion;
@@ -45,6 +46,10 @@ public class FilesCollectionProcessor implements FilesTraversal.ComparisonProces
     myStrictDeletion = strict;
 
     myUnableToDeleteFiles = new ArrayList<File>();
+  }
+
+  public boolean willProcess(FileInfo info) {
+    return true;
   }
 
   public void processUnchanged(FileInfo info) {
@@ -135,7 +140,15 @@ public class FilesCollectionProcessor implements FilesTraversal.ComparisonProces
       myLogger.warn("Detected new, unable to delete " + file.getAbsolutePath());
     } else {
       ++myDetectedNewAndDeleted;
-      myLogger.message("Detected new and deleted " + file.getAbsolutePath(), myVerbose);
+
+      final String message = "Detected new and deleted " + file.getAbsolutePath();
+      if (myVerbose) {
+        myLogger.message(message, true);
+      } else if ("true".equalsIgnoreCase(System.getProperty(Swabra.DEBUG_MODE))) {
+        myLogger.message(message, false);
+      } else {
+        myLogger.debug(message);
+      }
     }
   }
 
@@ -151,9 +164,9 @@ public class FilesCollectionProcessor implements FilesTraversal.ComparisonProces
     }
     if (myLockedFileResolver != null) {
       if (myStrictDeletion) {
-        return myLockedFileResolver.resolveDelete(f);
+        return myLockedFileResolver.resolveDelete(f, null);
       } else {
-        return myLockedFileResolver.resolve(f, false);
+        return myLockedFileResolver.resolve(f, false, null);
       }
     }
     return false;
