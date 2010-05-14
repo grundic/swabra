@@ -15,18 +15,7 @@
 </div>
 
 <c:choose>
-  <c:when test="${not empty propertiesBean.properties['swabra.mode']}">
-    <div class="parameter">
-      Kill processes:
-      <c:choose>
-        <c:when test="${propertiesBean.properties['swabra.kill']}">
-          <strong>enabled</strong>
-        </c:when>
-        <c:otherwise>
-          <strong>disabled</strong>
-        </c:otherwise>
-      </c:choose>
-    </div>
+  <c:when test="${not empty propertiesBean.properties['swabra.enabled']}">
     <div class="parameter">
       Ensure clean checkout directory:
       <c:choose>
@@ -37,6 +26,10 @@
           <strong>disabled</strong>
         </c:otherwise>
       </c:choose>
+    </div>
+    <div class="parameter">
+      Paths to ignore: <props:displayValue name="swabra.ignored"
+                                           emptyValue="none specified"/>
     </div>
     <div class="parameter">
       Verbose output:
@@ -52,14 +45,20 @@
   </c:when>
 </c:choose>
 
+<c:set var="selected"
+       value="${propertiesBean.properties['swabra.processes']}"/>
+
 <div class="parameter">
-  Locking processes detection:
+  Locking processes:
   <c:choose>
-    <c:when test="${not empty propertiesBean.properties['swabra.locking.processes']}">
-      <strong>enabled</strong>
+    <c:when test="${selected == 'report'}">
+      <strong>report</strong>
+    </c:when>
+    <c:when test="${selected == 'kill'}">
+      <strong>kill</strong>
     </c:when>
     <c:otherwise>
-      <strong>disabled</strong>
+      <strong>not detect</strong>
     </c:otherwise>
   </c:choose>
 </div>
