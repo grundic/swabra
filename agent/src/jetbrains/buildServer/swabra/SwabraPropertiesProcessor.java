@@ -58,7 +58,22 @@ final class SwabraPropertiesProcessor extends AgentLifeCycleAdapter {
   public void agentStarted(@NotNull BuildAgent agent) {
     myCleanupFinishedSignal = new CountDownLatch(1);
     myPropertiesFile = new File(agent.getConfiguration().getCacheDirectory(Swabra.CACHE_KEY), FILE_NAME);
-    cleanupPropertiesAndSnapshots(agent.getConfiguration().getWorkDirectory().listFiles());
+
+    final File[] actualCheckoutDirs = agent.getConfiguration().getWorkDirectory().listFiles();
+    if (actualCheckoutDirs == null) {
+      return;
+    }
+    new Thread(new Runnable() {
+      public void run() {
+        cleanupPropertiesAndSnapshots(actualCheckoutDirs);
+      }
+    }).start();
+  }
+
+  @Override
+  public void checkoutDirectoryRemoved(@NotNull File checkoutDir) {
+    deleteRecord(checkoutDir);
+    FileUtil.delete(getSnapshotFile(checkoutDir));
   }
 
   @NotNull
@@ -85,10 +100,12 @@ final class SwabraPropertiesProcessor extends AgentLifeCycleAdapter {
   }
 
   private void readProperties(boolean preserveFile) {
-    try {
-      myCleanupFinishedSignal.await();
-    } catch (InterruptedException e) {
-      myLogger.swabraWarn("Thread interrupted");
+    if (myCleanupFinishedSignal != null) {
+      try {
+        myCleanupFinishedSignal.await();
+      } catch (InterruptedException e) {
+        myLogger.swabraWarn("Thread interrupted");
+      }
     }
     readPropertiesNoAwait(preserveFile);
   }
@@ -165,46 +182,39 @@ final class SwabraPropertiesProcessor extends AgentLifeCycleAdapter {
   }
 
   private void cleanupPropertiesAndSnapshots(final File[] actualCheckoutDirs) {
-    if (actualCheckoutDirs == null) {
-      return;
-    }
-    new Thread(new Runnable() {
-      public void run() {
-        try {
-          readPropertiesNoAwait(false);
+    try {
+      readPropertiesNoAwait(false);
 
-          final Set<String> savedCheckoutDirs = myProperties.keySet();
-          final List<File> snapshots = getSnapshotFiles();
+      final Set<String> savedCheckoutDirs = myProperties.keySet();
+      final List<File> snapshots = getSnapshotFiles();
 
-          if (savedCheckoutDirs.isEmpty() && snapshots.isEmpty()) {
-            return;
-          }
-
-          final ArrayList<String> propertiesToRemove = new ArrayList<String>(savedCheckoutDirs);
-          final ArrayList<File> snapshotsToRemove = new ArrayList<File>(snapshots);
-
-          for (File dir : actualCheckoutDirs) {
-            if (!dir.isDirectory()) {
-              continue;
-            }
-            propertiesToRemove.remove(unifyPath(dir));
-            snapshotsToRemove.remove(getSnapshotFile(dir));
-          }
-
-          for (String s : propertiesToRemove) {
-            myProperties.remove(s);
-          }
-
-          writeProperties();
-
-          for (File f : snapshotsToRemove) {
-            FileUtil.delete(f);
-          }
-        } finally {
-          myCleanupFinishedSignal.countDown();
-        }
+      if (savedCheckoutDirs.isEmpty() && snapshots.isEmpty()) {
+        return;
       }
-    }).start();
+
+      final ArrayList<String> propertiesToRemove = new ArrayList<String>(savedCheckoutDirs);
+      final ArrayList<File> snapshotsToRemove = new ArrayList<File>(snapshots);
+
+      for (File dir : actualCheckoutDirs) {
+        if (!dir.isDirectory()) {
+          continue;
+        }
+        propertiesToRemove.remove(unifyPath(dir));
+        snapshotsToRemove.remove(getSnapshotFile(dir));
+      }
+
+      for (String s : propertiesToRemove) {
+        myProperties.remove(s);
+      }
+
+      writeProperties();
+
+      for (File f : snapshotsToRemove) {
+        FileUtil.delete(f);
+      }
+    } finally {
+      myCleanupFinishedSignal.countDown();
+    }
   }
 
   private List<File> getSnapshotFiles() {
