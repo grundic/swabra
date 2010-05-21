@@ -169,7 +169,9 @@ public class SwabraTest extends TestCase {
 //    System.setProperty(ProcessTreeTerminator.TEMP_PATH_SYSTEM_PROPERTY, pttTemp.getAbsolutePath());
 
 
-    dispatcher.getMulticaster().agentStarted(createBuildAgent(myCheckoutDir.getParentFile()));
+    final BuildAgent agent = createBuildAgent(myCheckoutDir.getParentFile());
+    dispatcher.getMulticaster().afterAgentConfigurationLoaded(agent);
+    dispatcher.getMulticaster().agentStarted(agent);
 
     final String checkoutDirPath = myCheckoutDir.getAbsolutePath();
 
