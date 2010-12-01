@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans default-autowire="constructor">
+  <bean class="jetbrains.buildServer.swabra.web.actions.UploadAction"/>
+  <bean class="jetbrains.buildServer.swabra.web.actions.DownloadAction"/>
+
+  <bean class="jetbrains.buildServer.swabra.web.HandleController" init-method="register"/>
+
+  <bean class="jetbrains.buildServer.swabra.HandleProvider"/>
+  <bean class="jetbrains.buildServer.swabra.SwabraBuildFeature"/>
+
+  <bean id="serverRootPath" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="targetObject">
+      <ref bean="buildServer"/>
+    </property>
+    <property name="targetMethod">
+      <value>getServerRootPath</value>
+    </property>
+  </bean>
+
+  <bean id="setSwabraPluginsFolder" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="staticMethod"
+              value="jetbrains.buildServer.swabra.HandleProvider.initPluginFile"/>
+    <property name="arguments">
+      <list>
+        <ref local="serverRootPath"/>
+      </list>
+    </property>
+  </bean>
+</beans>
