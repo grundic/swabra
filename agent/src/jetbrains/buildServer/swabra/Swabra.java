@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.swabra.processes.HandleProcessesProvider;
 import jetbrains.buildServer.swabra.processes.LockedFileResolver;
+import jetbrains.buildServer.swabra.processes.WmicProcessDetailsProvider;
 import jetbrains.buildServer.swabra.snapshots.*;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
@@ -95,7 +96,7 @@ public final class Swabra extends AgentLifeCycleAdapter {
       mySettings.prepareHandle(myLogger, myToolsRegistry);
 
       myLockedFileResolver = mySettings.isLockingProcessesDetectionEnabled() ?
-        new LockedFileResolver(new HandleProcessesProvider(mySettings.getHandlePath()), mySettings.getIgnoredProcesses()/*, myProcessTerminator,*/) : null;
+        new LockedFileResolver(new HandleProcessesProvider(mySettings.getHandlePath()), mySettings.getIgnoredProcesses(), new WmicProcessDetailsProvider()/*, myProcessTerminator,*/) : null;
 
       if (!mySettings.isCleanupEnabled()) {
         myLogger.message("Swabra cleanup is disabled", false);
