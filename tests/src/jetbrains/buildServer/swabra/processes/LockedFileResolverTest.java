@@ -34,6 +34,7 @@ import org.hamcrest.Matcher;
 import org.jetbrains.annotations.NotNull;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.internal.ExpectationBuilder;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -225,7 +226,8 @@ public class LockedFileResolverTest {
       TempFiles.class,
       Function.class,
       LockedFileResolver.class,
-      ThreadUtil.class
+      ThreadUtil.class,
+      ExpectationBuilder.class
     );
 
     final String sep = System.getProperty("path.separator");
