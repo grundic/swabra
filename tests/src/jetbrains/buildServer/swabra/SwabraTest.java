@@ -16,8 +16,10 @@
 
 package jetbrains.buildServer.swabra;
 
+import com.intellij.util.WaitFor;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -26,9 +28,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.agent.*;
+import jetbrains.buildServer.agent.impl.directories.*;
 import jetbrains.buildServer.swabra.snapshots.iteration.FileInfo;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
+import jetbrains.buildServer.util.SystemTimeService;
 import junit.framework.TestCase;
 import org.jetbrains.annotations.NotNull;
 import org.jmock.Expectations;
@@ -52,14 +56,17 @@ public class SwabraTest extends TestCase {
   private static final String AFTER_BUILD = "afterBuild";
 
   private File myCheckoutDir;
+  private File myAgentWorkDir;
   private TempFiles myTempFiles;
+  private BuildAgentConfiguration myAgentConf;
+  private BuildAgent myAgent;
   private Mockery myContext;
 
 
   private AgentRunningBuild createBuild(@NotNull final Map<String, String> runParams,
                                         @NotNull final File checkoutDir,
                                         @NotNull final SimpleBuildLogger logger) {
-    final AgentRunningBuild build = myContext.mock(AgentRunningBuild.class);
+    final AgentRunningBuild build = myContext.mock(AgentRunningBuild.class, "build" + System.currentTimeMillis());
 
     myContext.checking(new Expectations() {
       {
@@ -100,30 +107,6 @@ public class SwabraTest extends TestCase {
     });
   }
 
-  private BuildAgentConfiguration createBuildAgentConf(@NotNull final File cachesDir) {
-    final BuildAgentConfiguration conf = myContext.mock(BuildAgentConfiguration.class);
-    myContext.checking(new Expectations() {
-      {
-        allowing(conf).getCacheDirectory(with(Swabra.CACHE_KEY));
-        will(returnValue(cachesDir));
-        allowing(conf).getWorkDirectory();
-        will(returnValue(cachesDir));
-      }
-    });
-    return conf;
-  }
-
-  private BuildAgent createBuildAgent(@NotNull final File cachesDir) {
-    final BuildAgent agent = myContext.mock(BuildAgent.class);
-    myContext.checking(new Expectations() {
-      {
-        allowing(agent).getConfiguration();
-        will(returnValue(createBuildAgentConf(cachesDir)));
-      }
-    });
-    return agent;
-  }
-
   private SmartDirectoryCleaner createSmartDirectoryCleaner() {
     return new SmartDirectoryCleaner() {
       public void cleanFolder(@NotNull File file, @NotNull SmartDirectoryCleanerCallback callback) {
@@ -140,8 +123,22 @@ public class SwabraTest extends TestCase {
   public void setUp() throws Exception {
     myContext = new JUnit4Mockery();
     myTempFiles = new TempFiles();
-    myCheckoutDir = new File(myTempFiles.createTempDir(), "checkout_dir");
+    myAgentWorkDir = myTempFiles.createTempDir();
+    myAgentWorkDir.mkdirs();
+    myCheckoutDir = new File(myAgentWorkDir, "checkout_dir");
     myCheckoutDir.mkdirs();
+    myAgent = myContext.mock(BuildAgent.class);
+    myAgentConf = myContext.mock(BuildAgentConfiguration.class);
+    myContext.checking(new Expectations() {
+      {
+        allowing(myAgentConf).getCacheDirectory(with(Swabra.CACHE_KEY));
+        will(returnValue(myAgentWorkDir));
+        allowing(myAgentConf).getWorkDirectory();
+        will(returnValue(myAgentWorkDir));
+        allowing(myAgent).getConfiguration();
+        will(returnValue(myAgentConf));
+      }
+    });
   }
 
   @Override
@@ -170,7 +167,7 @@ public class SwabraTest extends TestCase {
     final EventDispatcher<AgentLifeCycleListener> dispatcher = EventDispatcher.create(AgentLifeCycleListener.class);
     final SwabraLogger swabraLogger = new SwabraLogger();
     final Swabra swabra = new Swabra(dispatcher, createSmartDirectoryCleaner(), new SwabraLogger(),
-      new SwabraPropertiesProcessor(dispatcher, swabraLogger), new BundledToolsRegistry() {
+                                     new SwabraPropertiesProcessor(dispatcher, swabraLogger, new DirectoryMapPersistanceImpl(myAgentConf, new SystemTimeService())), new BundledToolsRegistry() {
       public BundledTool findTool(@NotNull final String name) {
         return null;
       }
@@ -180,15 +177,14 @@ public class SwabraTest extends TestCase {
 //    System.setProperty(ProcessTreeTerminator.TEMP_PATH_SYSTEM_PROPERTY, pttTemp.getAbsolutePath());
 
 
-    final BuildAgent agent = createBuildAgent(myCheckoutDir.getParentFile());
-    dispatcher.getMulticaster().afterAgentConfigurationLoaded(agent);
-    dispatcher.getMulticaster().agentStarted(agent);
+    dispatcher.getMulticaster().afterAgentConfigurationLoaded(myAgent);
+    dispatcher.getMulticaster().agentStarted(myAgent);
 
     final String checkoutDirPath = myCheckoutDir.getAbsolutePath();
 
     final Map<String, String> runParams = new HashMap<String, String>();
     final AgentRunningBuild build = createBuild(runParams, myCheckoutDir, logger);
-    final BuildRunnerContext runner = myContext.mock(BuildRunnerContext.class);
+    final BuildRunnerContext runner = myContext.mock(BuildRunnerContext.class, "context"+System.currentTimeMillis());
 
     for (Map<String, String> param : params) {
       runParams.clear();
@@ -295,7 +291,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_b",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedStrict() throws Exception {
@@ -310,7 +306,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_b",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedAfterBuild() throws Exception {
@@ -323,7 +319,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_a",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedBeforeAfterNonStrict() throws Exception {
@@ -336,7 +332,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_b_a",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedBeforeAfterStrict() throws Exception {
@@ -351,7 +347,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.STRICT, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_b_a",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedAfterBeforeNonStrict() throws Exception {
@@ -364,7 +360,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_a_b",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedAfterBeforeStrict() throws Exception {
@@ -379,7 +375,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.STRICT, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_a_b",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedTurnedOffAfter() throws Exception {
@@ -391,7 +387,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_off_a",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneDeletedAfterBuild() throws Exception {
@@ -403,7 +399,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneDeleted", "oneDeleted_a",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneDeletedNonStrict() throws Exception {
@@ -416,7 +412,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneDeleted", "oneDeleted_a",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneDeletedStrict() throws Exception {
@@ -431,7 +427,7 @@ public class SwabraTest extends TestCase {
     secondCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneDeleted", "oneDeleted_a",
-      firstCallParams, secondCallParams);
+            firstCallParams, secondCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedNonStrict3() throws Exception {
@@ -448,7 +444,7 @@ public class SwabraTest extends TestCase {
     thirdCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_b_3",
-      firstCallParams, secondCallParams, thirdCallParams);
+            firstCallParams, secondCallParams, thirdCallParams);
   }
 
   public void testOneCreatedOneModifiedOneNotChangedStrict3() throws Exception {
@@ -468,7 +464,7 @@ public class SwabraTest extends TestCase {
     thirdCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
 
     runTest("oneCreatedOneModifiedOneNotChanged", "oneCreatedOneModifiedOneNotChanged_b_3",
-      firstCallParams, secondCallParams, thirdCallParams);
+            firstCallParams, secondCallParams, thirdCallParams);
   }
 
   public void testBuildInterruptedDuringCleanup() throws Exception {
@@ -490,29 +486,30 @@ public class SwabraTest extends TestCase {
       final SimpleBuildLogger logger = new BuildProgressLoggerMock(results);
       final EventDispatcher<AgentLifeCycleListener> dispatcher = EventDispatcher.create(AgentLifeCycleListener.class);
       final SwabraLogger swabraLogger = new SwabraLogger();
-      final SwabraPropertiesProcessor propertiesProcessor = new SwabraPropertiesProcessor(dispatcher, swabraLogger) {
-        @Override
-        public DirectoryState getState(final File dir) {
-          return dir.equals(myCheckoutDir) ? DirectoryState.PENDING : DirectoryState.UNKNOWN;
-        }
-
-        @Override
-        public File getSnapshotFile(final File dir) {
-          FileWriter writer  = null;
-          File snapshotFile = null;
-          try {
-            snapshotFile = File.createTempFile("swabraInterrupter", "snapshot");
-            writer = new FileWriter(snapshotFile);
-            writer.write(dir.getAbsolutePath());
-          } catch (IOException ignored) {
-          } finally {
-            if (writer != null){
-              try {writer.close();} catch (IOException ignored) {}
-            }
+      final SwabraPropertiesProcessor propertiesProcessor =
+        new SwabraPropertiesProcessor(dispatcher, swabraLogger, new DirectoryMapPersistanceImpl(myAgentConf, new SystemTimeService())) {
+          @Override
+          public DirectoryState getState(final File dir) {
+            return dir.equals(myCheckoutDir) ? DirectoryState.PENDING : DirectoryState.UNKNOWN;
           }
-          return snapshotFile;
-        }
-      };
+
+          @Override
+          public File getSnapshotFile(final File dir) {
+            FileWriter writer  = null;
+            File snapshotFile = null;
+            try {
+              snapshotFile = File.createTempFile("swabraInterrupter", "snapshot");
+              writer = new FileWriter(snapshotFile);
+              writer.write(dir.getAbsolutePath());
+            } catch (IOException ignored) {
+            } finally {
+              if (writer != null){
+                try {writer.close();} catch (IOException ignored) {}
+              }
+            }
+            return snapshotFile;
+          }
+        };
 
       final Swabra swabra = new Swabra(dispatcher, createSmartDirectoryCleaner(), new SwabraLogger(),
                                        propertiesProcessor, new BundledToolsRegistry() {
@@ -529,16 +526,15 @@ public class SwabraTest extends TestCase {
         @Override
         public boolean willProcess(final FileInfo info) throws InterruptedException {
           numberFilesProcessed.incrementAndGet();
+          System.out.println(info.toString());
           latch.countDown();
-          Thread.sleep(500);
+          Thread.sleep(2000);
           return super.willProcess(info);
         }
-      },
-                                  interruptedFlag);
+      }, interruptedFlag);
 
-      final BuildAgent agent = createBuildAgent(myCheckoutDir.getParentFile());
-      dispatcher.getMulticaster().afterAgentConfigurationLoaded(agent);
-      dispatcher.getMulticaster().agentStarted(agent);
+      dispatcher.getMulticaster().afterAgentConfigurationLoaded(myAgent);
+      dispatcher.getMulticaster().agentStarted(myAgent);
 
       final Map<String, String> runParams = new HashMap<String, String>();
       final AgentRunningBuild build = createBuild(runParams, myCheckoutDir, logger);
@@ -546,7 +542,7 @@ public class SwabraTest extends TestCase {
       final Thread interruptThread = new Thread(new Runnable() {
         public void run() {
           try {
-            latch.await(10, TimeUnit.SECONDS);
+            latch.await(100, TimeUnit.SECONDS);
             dispatcher.getMulticaster().beforeBuildInterrupted(build, BuildInterruptReason.SERVER_STOP_BUILD);
           } catch (InterruptedException ignored) {
           }
@@ -569,20 +565,32 @@ public class SwabraTest extends TestCase {
 
   // TW-29332
   public void testUnicodeFileNames_unchanged() throws Exception {
-    // need to manually set lastModified for all files to the same value in all folders;
-    Map<String, Long> modifiedDates = new HashMap<String, Long>();
-    final File beforeBuildDir = new File(getTestDataPath("unicodeFileNames_unchanged", null), "beforeBuild");
-    final File[] files = beforeBuildDir.listFiles();
-    for (File file : files) {
-      modifiedDates.put(file.getName(), file.lastModified());
-    }
-
-    for (String directory : Arrays.asList("afterBuild", "afterCheckout")){
-      File dir = new File(getTestDataPath("unicodeFileNames_unchanged", null), directory);
-      final File[] dirFiles = dir.listFiles();
-      for (File file : dirFiles) {
-        file.setLastModified(modifiedDates.get(file.getName()));
+    final long lastModified = System.currentTimeMillis();
+    final File testData = new File(getTestData(null, null), "unicodeFileNames_unchanged");
+    FileUtil.delete(testData);
+    for (String dirName : Arrays.asList("beforeBuild", "afterBuild", "afterCheckout")){
+      final File dir = new File(testData, dirName);
+      FileUtil.createDir(dir);
+      for (String fileName : Arrays.asList(
+        "\u0024\u0025\u0027\u0060\u002d\u0040\u007b\u007d\u007e\u0021\u0023\u0028\u0029\u0026\u005f\u005e",
+        "+file",
+        "-file",
+        ".File",
+        "347",
+        "\u003d\u005d\u005b\u003b\u002e\u002c\u002b\u2116",
+        "=file",
+        "file name (with brackets)",
+        "many.ext.en.sion.s",
+        "\u0072\u0065\u0073\u0074\u0061\u0072\u0074\u0069\u006e\u0067\u0040\u0032\u0078\u002e\u0070\u006e\u0067",
+        "\u0075\u006e\u0069\u0063\u006f\u0064\u0065\u002d\u00e4\u00df\u00e1\u00e1\u00f3\u00f6\u00e9\u00c4\u00fa\u00fc\u002d\u044b\u0439\u0401\u002e\u043f\u044b\u0445\u002d\u00ff",
+        "\u0078\u0073\u0073\u005f\u0074\u0072\u0079\u005f\u0025\u0032\u0037\u0025\u0032\u0032\u0025\u0033\u0043\u0073\u0063\u0072\u0069\u0070\u0074\u0025\u0033\u0045\u0061\u006c\u0065\u0072\u0074\u0028\u0036\u0036\u0036\u0029\u0025\u0033\u0042\u0025\u0033\u0043\u0025\u0032\u0046\u0073\u0063\u0072\u0069\u0070\u0074\u0025\u0033\u0045\u002e\u0070\u006e\u0067",
+        "\u0444\u0430\u0439\u043b\u043e"
+      )){
+        final File file = new File(dir, fileName);
+        FileUtil.writeFileAndReportErrors(file, "some text");
+        file.setLastModified(lastModified);
       }
+      dir.setLastModified(lastModified);
     }
 
     final Map<String, String> firstCallParams = new HashMap<String, String>();
@@ -633,5 +641,96 @@ public class SwabraTest extends TestCase {
     assertFalse(tempFileInDir.exists());
   }
 
+  //TW-39748
+  public void testDontCleanExternalCheckoutDirsOnAgentStart() throws Exception {
+    final File checkoutDir1 = new File(myAgentWorkDir, "checkoutDir1");
+    checkoutDir1.mkdirs();
+    final File checkoutDir2 = new File(myAgentWorkDir, "checkoutDir2/dir2");
+    checkoutDir2.mkdirs();
+    final File checkoutDir3 = myTempFiles.createTempDir();
+    checkoutDir3.mkdirs();
+    final EventDispatcher<AgentLifeCycleListener> dispatcher = EventDispatcher.create(AgentLifeCycleListener.class);
 
+    final List<DirectoryMapItem> items = new ArrayList<DirectoryMapItem>();
+    items.add(new DirectoryMapItem("bt1", "build1", checkoutDir1, System.currentTimeMillis(), DirectoryLifeTime.getDefault()));
+    items.add(new DirectoryMapItem("bt2", "build2", checkoutDir2, System.currentTimeMillis(), DirectoryLifeTime.getDefault()));
+    items.add(new DirectoryMapItem("bt3", "build3", checkoutDir3, System.currentTimeMillis(), DirectoryLifeTime.getDefault()));
+    DirectoryMapPersistance persistance = new DirectoryMapPersistanceImpl(myAgentConf, new SystemTimeService());
+    persistance.withDirectoriesMap(new DirectoryMapAction() {
+      public void action(@NotNull final DirectoryMapStructure data) {
+        for (DirectoryMapItem item : items) {
+          data.update(item);
+        }
+      }
+    });
+    final SwabraLogger swabraLogger = new SwabraLogger();
+    final SwabraPropertiesProcessor propertiesProcessor =
+      new SwabraPropertiesProcessor(dispatcher, swabraLogger, new DirectoryMapPersistanceImpl(myAgentConf, new SystemTimeService()));
+    final Swabra swabra = new Swabra(dispatcher, createSmartDirectoryCleaner(), new SwabraLogger(),
+                                     propertiesProcessor,
+                                     new BundledToolsRegistry() {
+                                       public BundledTool findTool(@NotNull final String name) {
+                                         return null;
+                                       }
+                                     });
+    final Map<String, String> firstCallParams = new HashMap<String, String>();
+    firstCallParams.put(SwabraUtil.ENABLED, SwabraUtil.BEFORE_BUILD);
+    firstCallParams.put(SwabraUtil.VERBOSE, SwabraUtil.TRUE);
+    final StringBuilder results = new StringBuilder();
+
+    final SimpleBuildLogger logger = new BuildProgressLoggerMock(results);
+
+    propertiesProcessor.afterAgentConfigurationLoaded(myAgent);
+    propertiesProcessor.agentStarted(myAgent);
+    new WaitFor(1000){
+      @Override
+      protected boolean condition() {
+        return propertiesProcessor.isInitialized();
+      }
+    };
+    for (final DirectoryMapItem item : items) {
+      final File folder = item.getLocation();
+      final AgentRunningBuild build = createBuild(firstCallParams, folder, logger);
+      swabra.buildStarted(build);
+      folder.mkdirs();
+      File file = new File(folder, "file.txt");
+      file.createNewFile();
+      swabra.sourcesUpdated(build);
+      swabra.afterAtrifactsPublished(build, BuildFinishedStatus.FINISHED_SUCCESS);
+      swabra.buildFinished(build, BuildFinishedStatus.FINISHED_SUCCESS);
+    }
+
+    /*
+E:\TEMP\test-1307328584\checkoutDir1=pending
+E:\TEMP\test-253694471=pending
+E:\TEMP\test-1307328584\checkoutDir2\dir2=pending
+    * */
+
+    propertiesProcessor.agentStarted(myAgent);
+    new WaitFor(1000){
+      @Override
+      protected boolean condition() {
+        return propertiesProcessor.isInitialized();
+      }
+    };
+
+    final File snapshotMap = new File(myAgentWorkDir, SwabraPropertiesProcessor.FILE_NAME);
+    final List<String> strings = FileUtil.readFile(snapshotMap);
+    for (String string : strings) {
+      boolean okay = false;
+      for (DirectoryMapItem item : items) {
+        okay = okay || item.getLocation().getAbsolutePath().equalsIgnoreCase(string.replace("=pending", ""));
+      }
+
+      assertTrue("No matching entry for " + string, okay);
+    }
+
+    final File[] list = myAgentWorkDir.listFiles(new FilenameFilter() {
+      public boolean accept(final File dir, final String name) {
+        return name.endsWith(".snapshot");
+      }
+    });
+    assertEquals(3, list.length);
+
+  }
 }

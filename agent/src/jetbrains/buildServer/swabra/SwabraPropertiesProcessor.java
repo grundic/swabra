@@ -22,6 +22,10 @@ import java.util.concurrent.CountDownLatch;
 import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
 import jetbrains.buildServer.agent.AgentLifeCycleListener;
 import jetbrains.buildServer.agent.BuildAgent;
+import jetbrains.buildServer.agent.impl.directories.DirectoryMapAction;
+import jetbrains.buildServer.agent.impl.directories.DirectoryMapItem;
+import jetbrains.buildServer.agent.impl.directories.DirectoryMapPersistance;
+import jetbrains.buildServer.agent.impl.directories.DirectoryMapStructure;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import org.jetbrains.annotations.NotNull;
@@ -36,21 +40,25 @@ import static jetbrains.buildServer.swabra.SwabraUtil.unifyPath;
  */
 
 public class SwabraPropertiesProcessor extends AgentLifeCycleAdapter {
-  private static final String FILE_NAME = "snapshot.map";
+  static final String FILE_NAME = "snapshot.map";
   private static final String KEY_VAL_SEPARATOR = "=";
 
   private static final String SNAPSHOT_SUFFIX = ".snapshot";
 
-  private Map<String, String> myProperties;
+  private final Map<String, String> myProperties;
   private final SwabraLogger myLogger;
+  @NotNull private final DirectoryMapPersistance myPersist;
   private File myPropertiesFile;
 
   private CountDownLatch myCleanupFinishedSignal;
 
   public SwabraPropertiesProcessor(@NotNull final EventDispatcher<AgentLifeCycleListener> agentDispatcher,
-                                   @NotNull final SwabraLogger logger) {
+                                   @NotNull final SwabraLogger logger,
+                                   @NotNull final DirectoryMapPersistance persistance) {
+    myPersist = persistance;
     agentDispatcher.addListener(this);
     myLogger = logger;
+    myProperties = new HashMap<String, String>();
   }
 
   @Override
@@ -62,10 +70,15 @@ public class SwabraPropertiesProcessor extends AgentLifeCycleAdapter {
   public void agentStarted(@NotNull BuildAgent agent) {
     myCleanupFinishedSignal = new CountDownLatch(1);
 
-    final File[] actualCheckoutDirs = agent.getConfiguration().getWorkDirectory().listFiles();
-    if (actualCheckoutDirs == null) {
-      return;
-    }
+    final List<File> actualCheckoutDirs = new ArrayList<File>();
+    myPersist.withDirectoriesMap(new DirectoryMapAction() {
+      public void action(@NotNull final DirectoryMapStructure data) {
+        final List<DirectoryMapItem> allItems = data.getAllItems();
+        for (DirectoryMapItem item : allItems) {
+          actualCheckoutDirs.add(item.getLocation());
+        }
+      }
+    });
     new Thread(new Runnable() {
       public void run() {
         cleanupPropertiesAndSnapshots(actualCheckoutDirs);
@@ -105,7 +118,6 @@ public class SwabraPropertiesProcessor extends AgentLifeCycleAdapter {
   }
 
   private void readPropertiesNoAwait(boolean preserveFile) {
-    myProperties = new HashMap<String, String>();
     if (!myPropertiesFile.isFile()) {
       myLogger.debug("Couldn't read directories states from " + myPropertiesFile.getAbsolutePath() + ", no file present");
       return;
@@ -179,7 +191,7 @@ public class SwabraPropertiesProcessor extends AgentLifeCycleAdapter {
     }
   }
 
-  private void cleanupPropertiesAndSnapshots(final File[] actualCheckoutDirs) {
+  private void cleanupPropertiesAndSnapshots(final List<File> actualCheckoutDirs) {
     try {
       readPropertiesNoAwait(false);
 
@@ -280,5 +292,10 @@ public class SwabraPropertiesProcessor extends AgentLifeCycleAdapter {
 
   public void markPending(@NotNull File dir, boolean strict) {
     mark(dir, strict ? DirectoryState.STRICT_PENDING.getName() : DirectoryState.PENDING.getName());
+  }
+
+  // for tests
+  public boolean isInitialized(){
+    return myCleanupFinishedSignal.getCount()==0;
   }
 }
