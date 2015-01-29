@@ -256,14 +256,14 @@ public final class Swabra extends AgentLifeCycleAdapter {
                    }
 
                    public void interrupted() {
-                     myPropertiesProcessor.markPending(checkoutDir, mySettings.isStrict());
+                     myPropertiesProcessor.markPending(checkoutDir, checkoutDir, mySettings.isStrict());
                    }
                  }
                                        :
                  new FilesCollector.SimpleCollectionResultHandler() {
                    @Override
                    public void interrupted() {
-                     myPropertiesProcessor.markPending(checkoutDir, mySettings.isStrict());
+                     myPropertiesProcessor.markPending(checkoutDir, checkoutDir, mySettings.isStrict());
                    }
 
                    @Override
@@ -348,7 +348,7 @@ public final class Swabra extends AgentLifeCycleAdapter {
     if (!new SnapshotGenerator(dir, myLogger).generateSnapshot(myPropertiesProcessor.getSnapshotFile(dir))) {
       mySettings.setCleanupEnabled(false);
     } else {
-      myPropertiesProcessor.markPending(dir, mySettings.isStrict());
+      myPropertiesProcessor.markPending(dir, mySettings.getCheckoutDir(), mySettings.isStrict());
     }
   }
 
@@ -364,23 +364,23 @@ public final class Swabra extends AgentLifeCycleAdapter {
     collectFiles(dir,
                  new FilesCollector.CollectionResultHandler() {
                    public void success() {
-                     myPropertiesProcessor.markClean(dir, mySettings.isStrict());
+                     myPropertiesProcessor.markClean(dir, mySettings.getCheckoutDir(), mySettings.isStrict());
                    }
 
                    public void error() {
-                     myPropertiesProcessor.markDirty(dir);
+                     myPropertiesProcessor.markDirty(dir, mySettings.getCheckoutDir());
                    }
 
                    public void lockedFilesDetected() {
-                     myPropertiesProcessor.markPending(dir, mySettings.isStrict());
+                     myPropertiesProcessor.markPending(dir, mySettings.getCheckoutDir(), mySettings.isStrict());
                    }
 
                    public void dirtyStateDetected() {
-                     myPropertiesProcessor.markDirty(dir);
+                     myPropertiesProcessor.markDirty(dir, mySettings.getCheckoutDir());
                    }
 
                    public void interrupted() {
-                     myPropertiesProcessor.markPending(dir, mySettings.isStrict());
+                     myPropertiesProcessor.markPending(dir, mySettings.getCheckoutDir(), mySettings.isStrict());
                    }
                  }
     );
