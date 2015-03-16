@@ -18,38 +18,30 @@ package jetbrains.buildServer.swabra;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.util.WaitFor;
-import java.io.*;
-import java.nio.channels.FileLock;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.agent.impl.directories.*;
-import jetbrains.buildServer.agent.impl.vcs.AgentRevisionManager;
-import jetbrains.buildServer.agent.impl.vcs.AgentRevisionManagerImpl;
-import jetbrains.buildServer.agentServer.AgentCheckoutDirRevisionInfo;
 import jetbrains.buildServer.swabra.snapshots.iteration.FileInfo;
 import jetbrains.buildServer.util.Action;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.SystemTimeService;
-import jetbrains.buildServer.vcs.CheckoutRules;
-import jetbrains.buildServer.vcs.VcsRoot;
-import jetbrains.buildServer.vcs.VcsRootEntry;
-import jetbrains.buildServer.vcs.impl.VcsRootImpl;
-import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.jetbrains.annotations.NotNull;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.After;
-import org.junit.Before;
 
 import static jetbrains.buildServer.swabra.TestUtil.getTestData;
 import static jetbrains.buildServer.swabra.TestUtil.getTestDataPath;
@@ -75,10 +67,10 @@ public class SwabraTest extends TestCase {
   private EventDispatcher<AgentLifeCycleListener> myDispatcher;
 
 
-  private AgentRunningBuildEx createBuild(@NotNull final Map<String, String> runParams,
+  private AgentRunningBuild createBuild(@NotNull final Map<String, String> runParams,
                                         @NotNull final File checkoutDir,
                                         @NotNull final SimpleBuildLogger logger) {
-    final AgentRunningBuildEx build = myContext.mock(AgentRunningBuildEx.class, "build" + System.currentTimeMillis());
+    final AgentRunningBuild build = myContext.mock(AgentRunningBuild.class, "build" + System.currentTimeMillis());
 
     myContext.checking(new Expectations() {
       {
