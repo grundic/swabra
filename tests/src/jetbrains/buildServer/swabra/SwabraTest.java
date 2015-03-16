@@ -50,8 +50,6 @@ import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.After;
 import org.junit.Before;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import static jetbrains.buildServer.swabra.TestUtil.getTestData;
 import static jetbrains.buildServer.swabra.TestUtil.getTestDataPath;
@@ -62,8 +60,7 @@ import static jetbrains.buildServer.swabra.TestUtil.getTestDataPath;
  * Date: 21.04.2009
  * Time: 15:03:19
  */
-@Test
-public class SwabraTest extends BaseTestCase {
+public class SwabraTest extends TestCase {
   private static final String BEFORE_BUILD = "beforeBuild";
   private static final String AFTER_CHECKOUT = "afterCheckout";
   private static final String AFTER_BUILD = "afterBuild";
@@ -134,7 +131,6 @@ public class SwabraTest extends BaseTestCase {
   }
 
   @Override
-  @BeforeMethod
   public void setUp() throws Exception {
     myContext = new JUnit4Mockery();
     myTempFiles = new TempFiles();
